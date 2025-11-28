@@ -18,4 +18,5 @@ app.use("/api/customer", customerRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/customer", customerRoutes);
 export default app;
