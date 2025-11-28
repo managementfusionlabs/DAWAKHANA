@@ -2,6 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// UI Components
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import GlassCard from "../../components/ui/GlassCard";
+
 export default function Login() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +17,7 @@ export default function Login() {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
         phone,
-        password
+        password,
       });
 
       const { token, role } = res.data;
@@ -30,46 +35,53 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+    <div
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: `url('/dawakhana-bg1.png')` }}
+    >
+      {/* subtle dim + blur */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
 
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Login
-        </h2>
+      {/* center container */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
 
-        <div className="flex flex-col gap-4">
-          <input
-            placeholder="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
-          />
+        {/* Glass Card */}
+        <GlassCard className="w-full max-w-md">
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
-          />
-
-          <button
-            onClick={handleLogin}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
-          >
+          <h2 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-lg">
             Login
-          </button>
+          </h2>
 
-          <p className="text-center text-gray-600 mt-2">
-            Don’t have an account?{" "}
+          <div className="flex flex-col gap-4 text-white">
+
+            <Input
+              placeholder="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Button onClick={handleLogin}>Login</Button>
+
+          </div>
+
+          <p className="text-center text-white/80 mt-4">
+            Don't have an account?{" "}
             <span
               onClick={() => navigate("/signup")}
-              className="text-blue-600 font-semibold cursor-pointer"
+              className="cursor-pointer font-semibold text-white hover:text-blue-200"
             >
               Signup
             </span>
           </p>
-        </div>
+
+        </GlassCard>
 
       </div>
     </div>
