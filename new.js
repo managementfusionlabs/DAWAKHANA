@@ -1,0 +1,1 @@
+console.log("This is the new.js file in the DAWAKHANA directory.");
