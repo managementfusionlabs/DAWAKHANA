@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
-
 // DASHBOARDS
 import CustomerHome from "./pages/customer/CustomerHome";
 import PharmacyDashboard from "./pages/pharmacy/PharmacyDashboard";
@@ -54,6 +53,8 @@ function App() {
         <Route path="/pharmacy/inventory" element={<PharmacyInventory />} />
         <Route path="/pharmacy/add-medicine" element={<AddMedicine />} />
         <Route path="/pharmacy/medicine/:id/edit" element={<EditMedicine />} />
+        {/* <Route path="/pharmacy/profile" element={<PharmacyProfile />} /> */}
+
 
         {/* Delivery */}
         <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />

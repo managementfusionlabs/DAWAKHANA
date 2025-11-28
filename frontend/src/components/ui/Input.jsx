@@ -7,7 +7,7 @@ export default function Input({ className = "", ...props }) {
         bg-white/20 
         border border-white/30 
         placeholder-white/70
-        text-white
+        text-neutral-600
         backdrop-blur-sm
         focus:ring-2 focus:ring-blue-300 
         outline-none transition

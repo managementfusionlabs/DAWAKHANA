@@ -7,7 +7,7 @@ import pharmacyRoutes from "./routes/pharmacyRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
-
+import medicineRoutes from "./routes/medicineRoutes.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -19,4 +19,5 @@ app.use("/api/order", orderRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/customer", customerRoutes);
+app.use("/api/medicines", medicineRoutes);
 export default app;

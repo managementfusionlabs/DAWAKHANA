@@ -1,41 +1,33 @@
 import express from "express";
-import {
-  addInventory,
-  getInventory,
-  updateInventory,
-  deleteInventory
-} from "../controllers/inventoryController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 
+import {
+  addInventory,
+  getInventory,
+  getInventoryItem,
+  updateInventory,
+  deleteInventory,
+} from "../controllers/inventoryController.js";
+
 const router = express.Router();
 
-router.post(
-  "/add",
-  authMiddleware,
-  roleMiddleware("pharmacy"),
-  addInventory
-);
+// Pharmacy only
+router.use(authMiddleware, roleMiddleware("pharmacy"));
 
-router.get(
-  "/list",
-  authMiddleware,
-  roleMiddleware("pharmacy"),
-  getInventory
-);
+// Add inventory item
+router.post("/add", addInventory);
 
-router.put(
-  "/update/:itemId",
-  authMiddleware,
-  roleMiddleware("pharmacy"),
-  updateInventory
-);
+// List all inventory items of this pharmacy
+router.get("/list", getInventory);
 
-router.delete(
-  "/delete/:itemId",
-  authMiddleware,
-  roleMiddleware("pharmacy"),
-  deleteInventory
-);
+// Get single inventory item
+router.get("/item/:itemId", getInventoryItem);
+
+// Update
+router.put("/update/:itemId", updateInventory);
+
+// Delete
+router.delete("/delete/:itemId", deleteInventory);
 
 export default router;

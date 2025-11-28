@@ -4,71 +4,69 @@ export const addInventory = async (req, res) => {
   try {
     const { medicineId, stock, price, expireDate } = req.body;
 
-    const pharmacyId = req.user.id; // owner is user
-
-    const item = await Inventory.create({
-      pharmacy: pharmacyId,
+    const newItem = new Inventory({
+      pharmacy: req.user.id,
       medicine: medicineId,
       stock,
       price,
-      expireDate
+      expireDate,
     });
 
-    res.json({ message: "Inventory item added", item });
+    await newItem.save();
+    res.json(newItem);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to add inventory" });
+    res.status(500).json({ message: "Failed to add item" });
   }
 };
 
 export const getInventory = async (req, res) => {
   try {
-    const pharmacyId = req.user.id;
-
-    const items = await Inventory.find({ pharmacy: pharmacyId }).populate(
-      "medicine"
-    );
-
+    const items = await Inventory.find({ pharmacy: req.user.id })
+      .populate("medicine");
     res.json(items);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch inventory" });
   }
 };
 
+export const getInventoryItem = async (req, res) => {
+  try {
+    const item = await Inventory.findOne({
+      _id: req.params.itemId,
+      pharmacy: req.user.id,
+    }).populate("medicine");
+
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch item" });
+  }
+};
+
 export const updateInventory = async (req, res) => {
   try {
-    const { itemId } = req.params;
-    const { stock, price, expireDate } = req.body;
-
-    const item = await Inventory.findOneAndUpdate(
-      { _id: itemId, pharmacy: req.user.id },
-      { stock, price, expireDate },
+    const updated = await Inventory.findOneAndUpdate(
+      { _id: req.params.itemId, pharmacy: req.user.id },
+      req.body,
       { new: true }
     );
 
-    if (!item)
-      return res.status(404).json({ message: "Inventory item not found" });
-
-    res.json({ message: "Updated", item });
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update inventory" });
+    res.status(500).json({ message: "Failed to update" });
   }
 };
 
 export const deleteInventory = async (req, res) => {
   try {
-    const { itemId } = req.params;
-
-    const item = await Inventory.findOneAndDelete({
-      _id: itemId,
-      pharmacy: req.user.id
+    await Inventory.findOneAndDelete({
+      _id: req.params.itemId,
+      pharmacy: req.user.id,
     });
-
-    if (!item)
-      return res.status(404).json({ message: "Item not found or not yours" });
 
     res.json({ message: "Deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete item" });
+    res.status(500).json({ message: "Failed to delete" });
   }
 };

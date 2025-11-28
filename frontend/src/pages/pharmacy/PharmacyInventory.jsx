@@ -13,12 +13,24 @@ export default function PharmacyInventory() {
   const navigate = useNavigate();
 
   const fetchInventory = () => {
-    axios
-      .get("/api/inventory", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((res) => setMeds(res.data))
-      .catch((err) => console.error(err));
+axios.get("/api/inventory/list", {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+})
+  .then((res) => {
+    console.log("INVENTORY RESPONSE:", res.data);
+
+    if (Array.isArray(res.data)) {
+      setMeds(res.data);
+    } else if (Array.isArray(res.data.items)) {
+      setMeds(res.data.items);
+    } else if (Array.isArray(res.data.inventory)) {
+      setMeds(res.data.inventory);
+    } else {
+      console.warn("Unexpected inventory format, defaulting to []");
+      setMeds([]);
+    }
+  })
+  .catch((err) => console.error(err));
   };
 
   useEffect(() => {
@@ -28,9 +40,10 @@ export default function PharmacyInventory() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this inventory item?")) return;
     try {
-      await axios.delete(`/api/inventory/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+     axios.delete(`/api/inventory/delete/${id}`, {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+})
+
       fetchInventory();
       alert("Deleted");
     } catch (err) {
@@ -52,7 +65,7 @@ export default function PharmacyInventory() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Inventory</h1>
         <div className="flex gap-3">
-          <Button onClick={() => navigate("/pharmacy/add")}>+ Add Medicine</Button>
+          <Button onClick={() => navigate("/pharmacy/add-medicine")}>+ Add Medicine</Button>
         </div>
       </div>
 
@@ -113,7 +126,8 @@ export default function PharmacyInventory() {
                   <td>{m.expireDate ? new Date(m.expireDate).toLocaleDateString() : "—"}</td>
                   <td className="flex gap-3">
                     <button
-                      onClick={() => navigate(`/pharmacy/inventory/edit/${m._id}`)}
+                      onClick={() => navigate(`/pharmacy/medicine/${m._id}/edit`)
+}
                       className="text-blue-600"
                     >
                       Edit
