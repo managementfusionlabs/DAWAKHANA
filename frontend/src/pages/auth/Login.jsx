@@ -30,33 +30,48 @@ export default function Login() {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
 
-      <input
-        placeholder="Phone"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      /><br /><br />
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Login
+        </h2>
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /><br /><br />
+        <div className="flex flex-col gap-4">
+          <input
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <button onClick={handleLogin}>Login</button>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <p style={{ marginTop: 10 }}>
-        Don’t have an account?{" "}
-        <span
-          style={{ cursor: "pointer", color: "blue" }}
-          onClick={() => navigate("/signup")}
-        >
-          Signup
-        </span>
-      </p>
+          <button
+            onClick={handleLogin}
+            className="w-full py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
+          >
+            Login
+          </button>
+
+          <p className="text-center text-gray-600 mt-2">
+            Don’t have an account?{" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className="text-blue-600 font-semibold cursor-pointer"
+            >
+              Signup
+            </span>
+          </p>
+        </div>
+
+      </div>
     </div>
   );
 }

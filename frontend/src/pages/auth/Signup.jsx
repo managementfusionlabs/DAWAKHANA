@@ -12,13 +12,13 @@ export default function Signup() {
 
   const handleSignup = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post("http://localhost:5000/api/auth/register", {
         name,
         phone,
         email,
         password,
         role,
-        details: {},   // keep blank for now
+        details: {},
       });
 
       alert("Signup successful! Login now.");
@@ -30,54 +30,71 @@ export default function Signup() {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>Signup</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+        
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Create Account
+        </h2>
 
-      <input
-        placeholder="Full name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      /><br /><br />
+        <div className="flex flex-col gap-4">
+          <input
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <input
-        placeholder="Phone"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      /><br /><br />
+          <input
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <input
-        placeholder="Email (optional)"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      /><br /><br />
+          <input
+            placeholder="Email (optional)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      /><br /><br />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          />
 
-      <label>Select Role:</label><br />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="customer">Customer</option>
-        <option value="pharmacy">Pharmacy Seller</option>
-        <option value="delivery">Delivery Agent</option>
-      </select>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full p-3 rounded-xl border bg-gray-50 focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="customer">Customer</option>
+            <option value="pharmacy">Pharmacy Seller</option>
+            <option value="delivery">Delivery Agent</option>
+          </select>
 
-      <br /><br />
+          <button
+            onClick={handleSignup}
+            className="w-full py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
+          >
+            Create Account
+          </button>
 
-      <button onClick={handleSignup}>Create Account</button>
-
-      <p style={{ marginTop: 10 }}>
-        Already have an account?{" "}
-        <span
-          style={{ cursor: "pointer", color: "blue" }}
-          onClick={() => navigate("/")}
-        >
-          Login
-        </span>
-      </p>
+          <p className="text-center text-gray-600 mt-2">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/")}
+              className="text-blue-600 font-semibold cursor-pointer"
+            >
+              Login
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,8 @@
+import { useState } from "react";
 import MainLayout from "../../components/layout/MainLayout";
 
-export default function PharmacyDashboard() {
-  const stats = [
-    { title: "Pending Orders", value: 8, color: "bg-blue-500" },
-    { title: "Completed Today", value: 12, color: "bg-green-500" },
-    { title: "Low Stock Items", value: 5, color: "bg-red-500" },
-  ];
+export default function PharmacyOrders() {
+  const [filter, setFilter] = useState("All");
 
   const orders = [
     {
@@ -26,34 +23,49 @@ export default function PharmacyDashboard() {
       total: 220,
       status: "Ready",
     },
+    {
+      id: "ORD-104",
+      customer: "Bilal Lone",
+      total: 480,
+      status: "Completed",
+    },
   ];
+
+  const filteredOrders =
+    filter === "All" ? orders : orders.filter((o) => o.status === filter);
 
   return (
     <MainLayout>
-      <h1 className="text-3xl font-bold mb-6">Pharmacy Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">Orders</h1>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-6">
-        {stats.map((s, i) => (
-          <div
-            key={i}
-            className={`p-6 rounded-xl shadow text-white ${s.color}`}
+      {/* Filters */}
+      <div className="flex gap-3 mb-6">
+        {["All", "Pending", "Packed", "Ready", "Completed"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 rounded-lg border transition ${
+              filter === f
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
           >
-            <p className="text-lg">{s.title}</p>
-            <p className="text-3xl font-bold mt-2">{s.value}</p>
-          </div>
+            {f}
+          </button>
         ))}
       </div>
 
-      {/* Latest Orders */}
-      <div className="mt-10 bg-white p-6 rounded-xl shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Latest Orders</h2>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-            View All
-          </button>
-        </div>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search Orders..."
+          className="w-full p-3 border rounded-xl bg-gray-50"
+        />
+      </div>
 
+      {/* Orders Table */}
+      <div className="bg-white p-6 rounded-xl shadow">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b text-gray-500">
@@ -66,11 +78,12 @@ export default function PharmacyDashboard() {
           </thead>
 
           <tbody>
-            {orders.map((o) => (
+            {filteredOrders.map((o) => (
               <tr key={o.id} className="border-b">
                 <td className="py-3">{o.id}</td>
                 <td>{o.customer}</td>
                 <td>₹{o.total}</td>
+
                 <td>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -78,6 +91,8 @@ export default function PharmacyDashboard() {
                         ? "bg-yellow-100 text-yellow-700"
                         : o.status === "Packed"
                         ? "bg-blue-100 text-blue-700"
+                        : o.status === "Ready"
+                        ? "bg-purple-100 text-purple-700"
                         : "bg-green-100 text-green-700"
                     }`}
                   >
@@ -92,6 +107,10 @@ export default function PharmacyDashboard() {
             ))}
           </tbody>
         </table>
+
+        {filteredOrders.length === 0 && (
+          <p className="text-center text-gray-500 py-6">No orders found.</p>
+        )}
       </div>
     </MainLayout>
   );
