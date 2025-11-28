@@ -1,125 +1,114 @@
+// src/pages/pharmacy/EditMedicine.jsx
+import { useEffect, useState } from "react";
+import axios from "axios";
 import MainLayout from "../../components/layout/MainLayout";
-import { useState } from "react";
+import GlassCard from "../../components/ui/GlassCard";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function EditMedicine() {
-  // Dummy data - later fetch from backend by ID
-  const existingData = {
-    name: "Paracetamol 500mg",
-    category: "Tablet",
-    price: 30,
-    stock: 120,
-    description: "Used for fever and mild pain relief.",
-  };
+  const { itemId } = useParams();
+  const navigate = useNavigate();
 
-  const [form, setForm] = useState(existingData);
+  const [form, setForm] = useState({
+    stock: "",
+    price: "",
+    expireDate: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!itemId) return;
+    axios
+      .get(`/api/inventory/${itemId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((res) => {
+        const it = res.data;
+        setForm({
+          stock: it.stock ?? "",
+          price: it.price ?? "",
+          expireDate: it.expireDate ? it.expireDate.split("T")[0] : "",
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to load inventory item:", err);
+        alert("Failed to load item");
+      });
+  }, [itemId]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm({
-      ...form,
-      [name]: files ? files[0] : value,
-    });
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Medicine:", form);
-    // Later: send update request to backend (PUT)
+    try {
+      setLoading(true);
+      await axios.put(
+        `/api/inventory/${itemId}`,
+        {
+          stock: Number(form.stock),
+          price: Number(form.price),
+          expireDate: form.expireDate || null,
+        },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      alert("Inventory updated");
+      navigate("/pharmacy/inventory");
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <MainLayout>
-      <h1 className="text-3xl font-bold mb-6">Edit Medicine</h1>
+      <h1 className="text-3xl font-bold mb-6">Edit Inventory Item</h1>
 
-      <div className="bg-white p-8 rounded-xl shadow max-w-3xl">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <GlassCard className="max-w-3xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Input
+            name="price"
+            type="number"
+            placeholder="Price (₹)"
+            value={form.price}
+            onChange={handleChange}
+          />
 
-          {/* Name */}
-          <div>
-            <label className="font-semibold">Medicine Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-            />
-          </div>
+          <Input
+            name="stock"
+            type="number"
+            placeholder="Stock"
+            value={form.stock}
+            onChange={handleChange}
+          />
 
-          {/* Category */}
-          <div>
-            <label className="font-semibold">Category</label>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
+          <Input
+            name="expireDate"
+            type="date"
+            value={form.expireDate}
+            onChange={handleChange}
+          />
+
+          <div className="flex gap-3">
+            <Button type="submit" className="flex-1" disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+            <button
+              type="button"
+              onClick={() => navigate("/pharmacy/inventory")}
+              className="py-3 px-6 rounded-xl bg-white/10 text-white border border-white/20"
             >
-              <option value="Tablet">Tablet</option>
-              <option value="Syrup">Syrup</option>
-              <option value="Gel">Gel</option>
-              <option value="Drops">Drops</option>
-              <option value="Injection">Injection</option>
-            </select>
+              Cancel
+            </button>
           </div>
-
-          {/* Price & Stock */}
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="font-semibold">Price (₹)</label>
-              <input
-                type="number"
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-              />
-            </div>
-
-            <div>
-              <label className="font-semibold">Stock</label>
-              <input
-                type="number"
-                name="stock"
-                value={form.stock}
-                onChange={handleChange}
-                className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="font-semibold">Description</label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50 h-28"
-            />
-          </div>
-
-          {/* Image Update */}
-          <div>
-            <label className="font-semibold">Update Image (optional)</label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-            />
-          </div>
-
-          {/* Save Changes */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-green-600 text-white rounded-xl shadow active:scale-95 transition"
-          >
-            Save Changes
-          </button>
-
         </form>
-      </div>
+      </GlassCard>
     </MainLayout>
   );
 }

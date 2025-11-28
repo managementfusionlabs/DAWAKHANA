@@ -1,22 +1,27 @@
-import Sidebar from "../ui/Sidebar";
-import Navbar from "../ui/Navbar";
-
+import { useEffect, useState } from "react";
+import AdminSidebar from "./AdminSidebar";
+import PharmacySidebar from "./PharmacySidebar";
+// import CustomerSidebar from "../sidebars/CustomerSidebar";
+// import DeliverySidebar from "../sidebars/DeliverySidebar";
 export default function MainLayout({ children }) {
-  return (
-    <div className="flex h-screen bg-gray-100">
-      
-      {/* Sidebar (Desktop only) */}
-      <Sidebar />
+  const [role, setRole] = useState("");
 
-      {/* Main Area */}
-      <div className="flex flex-col flex-1">
-        
-        <Navbar />
-        
-        <div className="p-6 overflow-y-auto">
-          {children}
-        </div>
-      </div>
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
+
+  return (
+    <div className="flex min-h-screen bg-gray-100">
+
+      {/* SIDEBAR - role based */}
+    
+      {role === "admin" && <AdminSidebar />}
+      {role === "pharmacy" && <PharmacySidebar />}
+      {role === "customer" && <CustomerSidebar />}
+      {role === "delivery" && <DeliverySidebar />}
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 p-6">{children}</div>
     </div>
   );
 }

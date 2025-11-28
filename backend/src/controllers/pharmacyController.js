@@ -51,5 +51,17 @@ export const getMyInventory = async (req, res) => {
   }
 };
 
+// GET /api/pharmacy/medicines
+export const getAllMedicines = async (req, res) => {
+  try {
+    const meds = await Medicine.find();
+    res.json(meds);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching medicines" });
+  }
+};
+
+
+
 
 

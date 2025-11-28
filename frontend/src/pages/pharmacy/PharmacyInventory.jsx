@@ -1,100 +1,135 @@
-import { useState } from "react";
+// src/pages/pharmacy/PharmacyInventory.jsx
+import { useEffect, useState } from "react";
+import axios from "axios";
 import MainLayout from "../../components/layout/MainLayout";
+import GlassCard from "../../components/ui/GlassCard";
+import Button from "../../components/ui/Button";
+import { useNavigate } from "react-router-dom";
 
 export default function PharmacyInventory() {
+  const [meds, setMeds] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
-  const meds = [
-    { id: 1, name: "Paracetamol 500mg", category: "Tablet", stock: 120, price: 30 },
-    { id: 2, name: "Cough Syrup 100ml", category: "Syrup", stock: 45, price: 90 },
-    { id: 3, name: "Vitamin C 500mg", category: "Tablet", stock: 15, price: 120 },
-    { id: 4, name: "Pain Relief Gel", category: "Gel", stock: 8, price: 140 },
-  ];
+  const fetchInventory = () => {
+    axios
+      .get("/api/inventory", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((res) => setMeds(res.data))
+      .catch((err) => console.error(err));
+  };
 
-  const filteredMeds =
-    filter === "All" ? meds : meds.filter((m) => m.category === filter);
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this inventory item?")) return;
+    try {
+      await axios.delete(`/api/inventory/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      fetchInventory();
+      alert("Deleted");
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
+    }
+  };
+
+  const filtered = meds.filter((m) => {
+    const cat = m.medicine?.category || "";
+    const name = m.medicine?.name || "";
+    if (filter !== "All" && cat !== filter) return false;
+    if (search && !name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <MainLayout>
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold mb-6">Inventory</h1>
-
-        <button className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow">
-          + Add Medicine
-        </button>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Inventory</h1>
+        <div className="flex gap-3">
+          <Button onClick={() => navigate("/pharmacy/add")}>+ Add Medicine</Button>
+        </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3 mb-6">
-        {["All", "Tablet", "Syrup", "Gel"].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setFilter(cat)}
-            className={`px-4 py-2 rounded-lg border transition ${
-              filter === cat
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Search Bar */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search medicine..."
-          className="w-full p-3 border rounded-xl bg-gray-50"
-        />
-      </div>
-
-      {/* Table */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-gray-500 border-b">
-              <th className="py-2">ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Stock</th>
-              <th>Price</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredMeds.map((m) => (
-              <tr key={m.id} className="border-b">
-                <td className="py-3">{m.id}</td>
-                <td>{m.name}</td>
-                <td>{m.category}</td>
-                <td>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      m.stock < 10
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {m.stock}
-                  </span>
-                </td>
-                <td>₹{m.price}</td>
-                <td className="flex gap-3">
-                  <button className="text-blue-600">Edit</button>
-                  <button className="text-red-600">Delete</button>
-                </td>
-              </tr>
+      <GlassCard>
+        <div className="flex justify-between mb-4">
+          <div className="flex gap-3">
+            {["All", "Tablet", "Syrup", "Gel", "Drops", "Injection"].map((c) => (
+              <button
+                key={c}
+                onClick={() => setFilter(c)}
+                className={`px-4 py-2 rounded-lg border transition ${
+                  filter === c ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                }`}
+              >
+                {c}
+              </button>
             ))}
-          </tbody>
-        </table>
+          </div>
 
-        {filteredMeds.length === 0 && (
-          <p className="text-center text-gray-500 py-6">No medicines found.</p>
-        )}
-      </div>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search medicine..."
+            className="p-2 border rounded-xl"
+          />
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-gray-500 border-b">
+                <th className="py-2">ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Price</th>
+                <th>Expire</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filtered.map((m) => (
+                <tr key={m._id} className="border-b">
+                  <td className="py-3">{m._id}</td>
+                  <td>{m.medicine?.name ?? "—"}</td>
+                  <td>{m.medicine?.category ?? "—"}</td>
+                  <td>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        m.stock < 10 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {m.stock}
+                    </span>
+                  </td>
+                  <td>₹{m.price}</td>
+                  <td>{m.expireDate ? new Date(m.expireDate).toLocaleDateString() : "—"}</td>
+                  <td className="flex gap-3">
+                    <button
+                      onClick={() => navigate(`/pharmacy/inventory/edit/${m._id}`)}
+                      className="text-blue-600"
+                    >
+                      Edit
+                    </button>
+                    <button onClick={() => handleDelete(m._id)} className="text-red-600">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filtered.length === 0 && <p className="text-center py-6 text-gray-500">No items.</p>}
+        </div>
+      </GlassCard>
     </MainLayout>
   );
 }

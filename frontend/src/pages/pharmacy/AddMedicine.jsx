@@ -1,127 +1,129 @@
+// src/pages/pharmacy/AddMedicine.jsx
+import { useEffect, useState } from "react";
+import axios from "axios";
 import MainLayout from "../../components/layout/MainLayout";
-import { useState } from "react";
+import GlassCard from "../../components/ui/GlassCard";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Select from "../../components/ui/Select";
+import { useNavigate } from "react-router-dom";
 
 export default function AddMedicine() {
+  const navigate = useNavigate();
+
+  const [medicineList, setMedicineList] = useState([]);
   const [form, setForm] = useState({
-    name: "",
-    category: "",
+    medicineId: "",
     price: "",
     stock: "",
-    description: "",
-    image: null,
+    expireDate: "",
   });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // fetch master medicines (backend should expose GET /api/medicines)
+    axios
+      .get("/api/medicines")
+      .then((res) => setMedicineList(res.data))
+      .catch((err) => {
+        console.log("Failed to fetch medicines", err);
+        setMedicineList([]);
+      });
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm({
-      ...form,
-      [name]: files ? files[0] : value,
-    });
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Medicine Submitted:", form);
-    // Later: send this to backend using axios
+    if (!form.medicineId) return alert("Select a medicine");
+
+    try {
+      setLoading(true);
+      await axios.post(
+        "/api/inventory",
+        {
+          medicineId: form.medicineId,
+          stock: Number(form.stock),
+          price: Number(form.price),
+          expireDate: form.expireDate || null,
+        },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+
+      alert("Medicine added to inventory");
+      navigate("/pharmacy/inventory");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add medicine");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <MainLayout>
-      <h1 className="text-3xl font-bold mb-6">Add New Medicine</h1>
+      <h1 className="text-3xl font-bold mb-6">Add Medicine to Inventory</h1>
 
-      <div className="bg-white p-8 rounded-xl shadow max-w-3xl">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-
-          {/* Name */}
-          <div>
-            <label className="font-semibold">Medicine Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-              placeholder="e.g. Paracetamol 500mg"
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="font-semibold">Category</label>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-            >
-              <option value="">Select Category</option>
-              <option value="Tablet">Tablet</option>
-              <option value="Syrup">Syrup</option>
-              <option value="Gel">Gel</option>
-              <option value="Drops">Drops</option>
-              <option value="Injection">Injection</option>
-            </select>
-          </div>
-
-          {/* Price + Stock */}
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="font-semibold">Price (₹)</label>
-              <input
-                type="number"
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-                placeholder="e.g. 80"
-              />
-            </div>
-
-            <div>
-              <label className="font-semibold">Stock</label>
-              <input
-                type="number"
-                name="stock"
-                value={form.stock}
-                onChange={handleChange}
-                className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-                placeholder="e.g. 100"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="font-semibold">Description</label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50 h-28"
-              placeholder="Enter short description of medicine"
-            />
-          </div>
-
-          {/* Image */}
-          <div>
-            <label className="font-semibold">Medicine Image (optional)</label>
-            <input
-              type="file"
-              name="image"
-              className="w-full mt-2 p-3 border rounded-xl bg-gray-50"
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-blue-600 text-white rounded-xl shadow active:scale-95 transition"
+      <GlassCard className="max-w-3xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="font-semibold text-white">Medicine</label>
+          <Select
+            name="medicineId"
+            value={form.medicineId}
+            onChange={handleChange}
+            className="text-black"
           >
-            Save Medicine
-          </button>
+            <option value="">-- Select medicine --</option>
+            {medicineList.map((m) => (
+              <option key={m._id} value={m._id}>
+                {m.name} {m.brand ? `— ${m.brand}` : ""}
+              </option>
+            ))}
+          </Select>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              name="price"
+              type="number"
+              placeholder="Price (₹)"
+              value={form.price}
+              onChange={handleChange}
+            />
+            <Input
+              name="stock"
+              type="number"
+              placeholder="Stock"
+              value={form.stock}
+              onChange={handleChange}
+            />
+          </div>
+
+          <Input
+            name="expireDate"
+            type="date"
+            placeholder="Expire date (optional)"
+            value={form.expireDate}
+            onChange={handleChange}
+          />
+
+          <div className="flex gap-3">
+            <Button type="submit" className="flex-1" disabled={loading}>
+              {loading ? "Saving..." : "Add to Inventory"}
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/pharmacy/inventory")}
+              className="py-3 px-6 rounded-xl bg-white/10 text-white border border-white/20"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
-      </div>
+      </GlassCard>
     </MainLayout>
   );
 }
