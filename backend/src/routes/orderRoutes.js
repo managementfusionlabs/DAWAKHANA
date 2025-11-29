@@ -5,7 +5,7 @@ import {
   updateOrderStatusByPharmacy,
    getAvailableAgents,
    pharmacyAssignAgent,
-   agentAcceptOrder
+   getMyOrders
 } from "../controllers/orderController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
@@ -18,6 +18,12 @@ router.post(
   authMiddleware,
   roleMiddleware("customer"),
   createOrder
+);
+router.get(
+  "/my-orders",
+  authMiddleware,
+  roleMiddleware("customer"),
+  getMyOrders
 );
 
 // Pharmacy
@@ -50,12 +56,12 @@ router.put(
   pharmacyAssignAgent
 );
 
-router.put(
-  "/agent/accept/:orderId",
-  authMiddleware,
-  roleMiddleware("delivery"),
-  agentAcceptOrder
-);
+// router.put(
+//   "/agent/accept/:orderId",
+//   authMiddleware,
+//   roleMiddleware("delivery"),
+//   agentAcceptOrder
+// );
 // router.put(
 //   "/assign/:orderId",
 //   authMiddleware,

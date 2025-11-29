@@ -24,7 +24,7 @@ import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminDeliveryAgents from "./pages/admin/AdminDeliveryAgents";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminPharmacyDetails from "./pages/admin/AdminPharmacyDetails";
-
+import CreateMedicine from "./pages/pharmacy/CreateMedicine";
 // export default function App() {
 //   return (<div className="text-4xl font-bold text-blue-500">
 //   Tailwind is now alive 🔥
@@ -53,6 +53,8 @@ function App() {
         <Route path="/pharmacy/inventory" element={<PharmacyInventory />} />
         <Route path="/pharmacy/add-medicine" element={<AddMedicine />} />
         <Route path="/pharmacy/medicine/:id/edit" element={<EditMedicine />} />
+        <Route path="/pharmacy/medicines/create" element={<CreateMedicine />} />
+
         {/* <Route path="/pharmacy/profile" element={<PharmacyProfile />} /> */}
 
 

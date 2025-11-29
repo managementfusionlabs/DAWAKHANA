@@ -49,6 +49,16 @@ export const getPharmacyOrders = async (req, res) => {
   }
 };
 
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ customer: req.user.id }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
+};
+
+
 export const updateOrderStatusByPharmacy = async (req, res) => {
   try {
     const { orderId } = req.params;

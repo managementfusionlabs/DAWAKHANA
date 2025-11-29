@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddMedicine() {
   const navigate = useNavigate();
-
+  const [filteredMedicines, setFilteredMedicines] = useState([]);
   const [medicineList, setMedicineList] = useState([]);
   const [form, setForm] = useState({
     medicineId: "",
@@ -22,11 +22,12 @@ export default function AddMedicine() {
 
   useEffect(() => {
     axios
-      .get("/api/medicines", {
+      .get("/api/pharmacy/medicines", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
         setMedicineList(Array.isArray(res.data) ? res.data : []);
+        setFilteredMedicines(Array.isArray(res.data) ? res.data : []);
       })
       .catch(() => setMedicineList([]));
   }, []);
@@ -75,35 +76,39 @@ export default function AddMedicine() {
       <GlassCard className="max-w-3xl mx-auto p-10 backdrop-blur-xl bg-white/50 shadow-2xl border border-white/40 rounded-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
 
-          {/* MEDICINE DROPDOWN */}
-          <div className="flex flex-col gap-2">
-            <label className="font-semibold text-gray-700 text-lg">
-              Select Medicine
-            </label>
+{/* SEARCH + SELECT MEDICINE */}
+<div className="flex flex-col gap-2">
+  <label className="font-semibold text-gray-700 text-lg">Select Medicine</label>
 
-            <select
-              name="medicineId"
-              value={form.medicineId}
-              onChange={handleChange}
-              className="p-4 rounded-xl bg-white/70 text-gray-800 shadow-inner border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 transition"
-            >
-              <option value="" className="text-gray-600">
-                -- Choose a medicine --
-              </option>
+  <input
+    type="text"
+    placeholder="Search medicine..."
+    className="p-4 rounded-xl bg-white/70 text-gray-800 shadow-inner border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+    onChange={(e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = medicineList.filter((m) =>
+        m.name.toLowerCase().includes(q)
+      );
+      setFilteredMedicines(filtered);
+    }}
+  />
 
-              {medicineList.map((m) => (
-                <option
-                  key={m._id}
-                  value={m._id}
-                  className="text-gray-900 bg-white"
-                >
-                  {m.name}
-                  {m.form ? ` — ${m.form}` : ""}
-                  {m.category ? ` — ${m.category}` : ""}
-                </option>
-              ))}
-            </select>
-          </div>
+  <select
+    name="medicineId"
+    value={form.medicineId}
+    onChange={handleChange}
+    className="p-4 rounded-xl bg-white/70 text-gray-800 shadow-inner border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 transition"
+  >
+    <option value="">-- Choose a medicine --</option>
+
+    {filteredMedicines.map((m) => (
+      <option key={m._id} value={m._id}>
+        {m.name} {m.form ? `— ${m.form}` : ""} {m.category ? `— ${m.category}` : ""}
+      </option>
+    ))}
+  </select>
+</div>
+
 
           {/* PRICE & STOCK */}
           <div className="grid grid-cols-2 gap-6">

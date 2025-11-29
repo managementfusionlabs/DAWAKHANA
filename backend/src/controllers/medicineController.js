@@ -9,3 +9,19 @@ export const getAllMedicines = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch medicines" });
   }
 };
+
+export const createMedicine = async (req, res) => {
+  try {
+    console.log("Creating medicine with data:", req.body);
+    const med = new Medicine({
+      ...req.body,
+      pharmacy: req.user.id, // pharmacy ID from JWT
+    });
+
+    await med.save();
+    res.json(med);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to create medicine" });
+  }
+};
