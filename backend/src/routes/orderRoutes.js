@@ -9,6 +9,8 @@ import {
 } from "../controllers/orderController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import Order from "../models/Order.js";
+
 
 const router = express.Router();
 
@@ -33,6 +35,35 @@ router.get(
   roleMiddleware("pharmacy"),
   getPharmacyOrders
 );
+
+
+// Get a single order for pharmacy
+router.get(
+  "/pharmacy/:orderId",
+  authMiddleware,
+  roleMiddleware("pharmacy"),
+  async (req, res) => {
+    try {
+      const order = await Order.findOne({
+        _id: req.params.orderId,
+        pharmacy: req.user.id, // ensures a pharmacy can load only its own orders
+      })
+        .populate("customer")
+        .populate("items.medicine");
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json(order);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Failed to fetch order" });
+    }
+  }
+);
+
+
 
 router.put(
   "/pharmacy/status/:orderId",

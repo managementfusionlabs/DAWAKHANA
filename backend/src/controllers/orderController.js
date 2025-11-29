@@ -1,35 +1,71 @@
 import Order from "../models/Order.js";
 import User from "../models/User.js";
+import Inventory from "../models/Inventory.js"
 
+
+// Create a new order
 export const createOrder = async (req, res) => {
   try {
-    const { pharmacyId, items, address } = req.body;
+    const { pharmacyId: pharmacyIdFromClient, items, address } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in order" });
 
-    let total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // compute total safely
+    const total = items.reduce((sum, item) => {
+      const price = Number(item.price) || 0;
+      const quantity = Number(item.quantity) || 0;
+      return sum + price * quantity;
+    }, 0);
+
+    // Determine pharmacy:
+    // Prefer client-provided pharmacyId. If missing, try to infer from Inventory for first item.
+    let pharmacyId = pharmacyIdFromClient;
+
+    if (!pharmacyId) {
+      // try to infer by checking inventory record for the first medicine/inventoryId
+      // item might contain medicineId or inventoryId depending on frontend
+      const first = items[0];
+      let inventoryRecord = null;
+
+      if (first.inventoryId) {
+        inventoryRecord = await Inventory.findById(first.inventoryId).lean();
+      } else if (first.medicineId) {
+        // find inventory entry that matches this medicine (and has stock) — best effort
+        inventoryRecord = await Inventory.findOne({ medicine: first.medicineId }).lean();
+      }
+
+      if (inventoryRecord) pharmacyId = inventoryRecord.pharmacy?.toString();
+    }
+
+    if (!pharmacyId) {
+      // If still not found, reject — it's important each order links to a pharmacy
+      return res.status(400).json({ message: "pharmacyId missing and could not be inferred" });
+    }
+
+    // Build order items in the shape your Order model expects
+    const orderItems = items.map((i) => ({
+      medicine: i.medicineId || i.medicine, // tolerate multiple names
+      quantity: Number(i.quantity) || Number(i.qty) || 1,
+      price: Number(i.price) || 0,
+    }));
 
     const order = await Order.create({
       customer: req.user.id,
       pharmacy: pharmacyId,
-      items: items.map((i) => ({
-        medicine: i.medicineId,
-        quantity: i.quantity,
-        price: i.price
-      })),
+      items: orderItems,
       totalAmount: total,
       finalAmount: total,
       address,
-      status: "pending"
+      status: "pending",
     });
 
     res.json({
       message: "Order created",
-      order
+      order,
     });
   } catch (err) {
-    console.log(err);
+    console.error("createOrder error:", err);
     res.status(500).json({ message: "Order creation failed" });
   }
 };
@@ -62,7 +98,7 @@ export const getMyOrders = async (req, res) => {
 export const updateOrderStatusByPharmacy = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { status } = req.body; // accepted / rejected
+    const { status } = req.body;
 
     const order = await Order.findOne({
       _id: orderId,
@@ -72,17 +108,30 @@ export const updateOrderStatusByPharmacy = async (req, res) => {
     if (!order)
       return res.status(404).json({ message: "Order not found" });
 
-    if (!["accepted", "rejected"].includes(status))
+    const validStatuses = [
+      "pending",
+      "accepted",
+      "processing",
+      "ready_for_pickup",
+      "assigned_to_agent",
+      "out_for_delivery",
+      "delivered",
+      "rejected"
+    ];
+
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
+    }
 
     order.status = status;
     await order.save();
 
-    res.json({ message: "Updated", order });
+    res.json({ message: "Status updated", order });
   } catch (err) {
     res.status(500).json({ message: "Status update failed" });
   }
 };
+
 
 export const assignDeliveryAgent = async (req, res) => {
   try {

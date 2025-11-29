@@ -12,32 +12,31 @@ export default function PharmacyOrderDetails() {
   const [order, setOrder] = useState(null);
   const [loadingStatus, setLoadingStatus] = useState(false);
 
-  useEffect(() => {
-    if (!id) return;
-    axios
-      .get(`/api/pharmacy/orders/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((res) => setOrder(res.data))
-      .catch((err) => {
-        console.error(err);
-        alert("Failed to load order");
+  const loadOrder = async () => {
+    try {
+      const { data } = await axios.get(`/api/order/pharmacy/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
+      setOrder(data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load order");
+    }
+  };
+
+  useEffect(() => {
+    if (id) loadOrder();
   }, [id]);
 
   const updateStatus = async (status) => {
     try {
       setLoadingStatus(true);
       await axios.put(
-        `/api/pharmacy/orders/${id}/status`,
+        `/api/order/pharmacy/status/${id}`,
         { status },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      // reload order
-      const { data } = await axios.get(`/api/pharmacy/orders/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setOrder(data);
+      loadOrder();
     } catch (err) {
       console.error(err);
       alert("Failed to update status");
@@ -46,7 +45,13 @@ export default function PharmacyOrderDetails() {
     }
   };
 
-  if (!order) return <MainLayout><p className="p-6">Loading...</p></MainLayout>;
+  if (!order) {
+    return (
+      <MainLayout>
+        <p className="p-6">Loading...</p>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -55,10 +60,12 @@ export default function PharmacyOrderDetails() {
       <GlassCard className="mb-6">
         <div className="flex justify-between">
           <div>
-            <p className="text-xl font-semibold">Order: {order._id}</p>
-            <p className="text-gray-300 mt-1">Customer: <span className="font-medium text-white">{order.customer?.name ?? "—"}</span></p>
+            <p className="text-xl font-semibold">Order #{order._id}</p>
+            <p className="text-gray-300 mt-1">
+              Customer: <span className="font-medium text-white">{order.customer?.name ?? "—"}</span>
+            </p>
             <p className="text-gray-300">Phone: {order.customer?.phone ?? "—"}</p>
-            <p className="text-gray-300">Address: {order.address?.addressLine ?? "-"}</p>
+            <p className="text-gray-300">Address: {order.address?.addressLine ?? "—"}</p>
           </div>
 
           <div>
@@ -71,6 +78,7 @@ export default function PharmacyOrderDetails() {
 
       <GlassCard className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Items</h2>
+
         <table className="w-full text-left">
           <thead>
             <tr className="text-gray-400 border-b">
@@ -84,8 +92,9 @@ export default function PharmacyOrderDetails() {
           <tbody>
             {order.items.map((it, i) => {
               const name = it.medicine?.name ?? it.medicineName ?? "—";
-              const qty = it.quantity ?? it.qty ?? 1;
+              const qty = it.quantity ?? 1;
               const price = it.price ?? 0;
+
               return (
                 <tr key={i} className="border-b">
                   <td className="py-3">{name}</td>
@@ -104,15 +113,17 @@ export default function PharmacyOrderDetails() {
       </GlassCard>
 
       <div className="flex gap-3">
-        <Button onClick={() => updateStatus("processing")} disabled={loadingStatus}>
+        <Button disabled={loadingStatus} onClick={() => updateStatus("processing")}>
           {loadingStatus ? "..." : "Mark Processing"}
         </Button>
+
         <button
           onClick={() => updateStatus("ready_for_pickup")}
-          className="px-6 py-3 bg-green-600 text-white rounded-lg shadow active:scale-95 transition"
+          className="px-6 py-3 bg-green-600 text-white rounded-lg shadow active:scale-95"
         >
           Mark Ready
         </button>
+
         <button
           onClick={() => navigate("/pharmacy/orders")}
           className="px-6 py-3 bg-white/10 text-white border rounded-lg"

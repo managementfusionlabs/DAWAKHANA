@@ -29,4 +29,5 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/pharmacy/medicines", medicineRoutes);
 
 
+
 export default app;

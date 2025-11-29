@@ -25,11 +25,8 @@ import AdminDeliveryAgents from "./pages/admin/AdminDeliveryAgents";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminPharmacyDetails from "./pages/admin/AdminPharmacyDetails";
 import CreateMedicine from "./pages/pharmacy/CreateMedicine";
-// export default function App() {
-//   return (<div className="text-4xl font-bold text-blue-500">
-//   Tailwind is now alive 🔥
-// </div>
-//   );}
+
+
 function App() {
   return (
     <BrowserRouter>

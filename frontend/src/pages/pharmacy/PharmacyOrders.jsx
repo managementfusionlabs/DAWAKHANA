@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
-import Button from "../../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 
 export default function PharmacyOrders() {
@@ -13,11 +12,11 @@ export default function PharmacyOrders() {
 
   useEffect(() => {
     axios
-      .get("/api/pharmacy/orders", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      .get("/api/order/pharmacy", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then((res) => setOrders(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Pharmacy orders error:", err));
   }, []);
 
   const filtered = filter === "All" ? orders : orders.filter((o) => o.status === filter);
@@ -57,15 +56,18 @@ export default function PharmacyOrders() {
               {filtered.map((o) => (
                 <tr key={o._id} className="border-b">
                   <td className="py-3">{o._id}</td>
-                  <td>{o.customer?.name ?? "Anonymous"}</td>
-                  <td>₹{o.finalAmount ?? o.totalAmount ?? o.totalAmount}</td>
+                  <td>{o.customer?.name ?? "—"}</td>
+                  <td>₹{o.finalAmount ?? o.totalAmount ?? 0}</td>
                   <td>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold">
                       {o.status}
                     </span>
                   </td>
                   <td>
-                    <button onClick={() => navigate(`/pharmacy/orders/${o._id}`)} className="text-blue-600">
+                    <button
+                      onClick={() => navigate(`/pharmacy/orders/${o._id}`)}
+                      className="text-blue-600"
+                    >
                       View
                     </button>
                   </td>
