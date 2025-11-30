@@ -40,7 +40,7 @@ export default function Login() {
       style={{ backgroundImage: `url('/dawakhana-bg1.png')` }}
     >
       {/* subtle dim + blur */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/20 "></div>
 
       {/* center container */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">

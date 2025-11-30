@@ -77,7 +77,7 @@ export default function Signup() {
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url('/dawakhana-bg.webp')` }}
     >
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[3px]"></div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <GlassCard className="w-full max-w-md">

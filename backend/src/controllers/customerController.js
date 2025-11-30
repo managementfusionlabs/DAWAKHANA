@@ -1,6 +1,8 @@
 import Inventory from "../models/Inventory.js";
 import Medicine from "../models/Medicine.js";
 
+
+// Get all medicines across pharmacies
 export const getAllMedicines = async (req, res) => {
   try {
     const data = await Inventory.find()
@@ -14,6 +16,8 @@ export const getAllMedicines = async (req, res) => {
   }
 };
 
+
+// Get medicines by pharmacy
 export const getMedicinesByPharmacy = async (req, res) => {
   try {
     const { pharmacyId } = req.params;
@@ -28,6 +32,7 @@ export const getMedicinesByPharmacy = async (req, res) => {
   }
 };
 
+// Search medicines by name
 export const searchMedicines = async (req, res) => {
   try {
     const { query } = req.query;

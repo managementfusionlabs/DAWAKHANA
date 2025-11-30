@@ -13,7 +13,7 @@ export default function DeliveryOrderDetails() {
     let mounted = true;
     setLoading(true);
     axios
-      .get(`/orders/pharmacy/${id}`, { withCredentials: true })
+      .get(`/orders/${id}`, { withCredentials: true })
       .then((res) => {
         if (!mounted) return;
         setOrder(res.data);
@@ -77,7 +77,9 @@ export default function DeliveryOrderDetails() {
     );
   }
 
-  const orderCustomer = order.customer || order.customerDetails || {};
+const orderCustomer = order.customer || {};
+const orderAddress = order.address || {};
+
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -90,9 +92,13 @@ export default function DeliveryOrderDetails() {
           <p className="font-semibold text-gray-800 text-lg">Order: {order._id}</p>
 
           <div className="mt-3">
-            <p className="text-gray-600">Customer: {orderCustomer.name || "-"}</p>
-            <p className="text-gray-600">Phone: {orderCustomer.phone || "-"}</p>
-            <p className="text-gray-600">Address: {order.address || "-"}</p>
+           <p className="text-gray-600">Customer: {orderCustomer.name || "-"}</p>
+           <p className="text-gray-600">Phone: {orderCustomer.phone || "-"}</p>
+          <p className="text-gray-600">
+                  Address: 
+                    {orderAddress.addressLine ||
+                     orderAddress.city ||
+                     orderAddress.pincode || "-"} </p>
 
             <span
               className={`px-3 py-1 mt-3 inline-block rounded-full text-xs font-semibold

@@ -3,9 +3,9 @@ export default function Button({ children, className = "", ...props }) {
     <button
       {...props}
       className={`
-        w-full py-3 rounded-xl 
+        w-full py-3 rounded-[50px] 
         bg-blue-500/80 
-        hover:bg-blue-600/80 
+        hover:bg-blue-800
         text-white font-semibold
         shadow-lg transition
         backdrop-blur-xl

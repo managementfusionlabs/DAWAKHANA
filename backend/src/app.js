@@ -13,8 +13,10 @@ import orderRoutes from "./routes/orderRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 
+// Initialize Express app
 const app = express();
 
+// CROSS-Origin Resource Sharing (CORS) configuration
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -22,14 +24,17 @@ app.use(
   })
 );
 
+// Additional headers to support CORS with credentials
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
+// Define routes
 app.use("/api/auth", authRoutes);
 app.use("/api/pharmacy", pharmacyRoutes);
 app.use("/api/customer", customerRoutes);

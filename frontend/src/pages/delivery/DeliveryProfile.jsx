@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import BottomNav from "../../components/ui/BottomNav";
 
 export default function DeliveryProfile() {
@@ -11,7 +11,7 @@ export default function DeliveryProfile() {
     let mounted = true;
     setLoading(true);
     axios
-      .get("/users/me", { withCredentials: true })
+      .get("/delivery/me", { withCredentials: true })
       .then((res) => {
         if (!mounted) return;
         setRider(res.data);

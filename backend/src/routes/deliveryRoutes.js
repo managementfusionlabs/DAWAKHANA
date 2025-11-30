@@ -7,9 +7,28 @@ import { deliveryUpdateStatus } from "../controllers/orderController.js"; // use
 import { toggleAvailability } from "../controllers/deliveryController.js";
 
 const router = express.Router();
+router.use(authMiddleware);
+
+
+// GET /api/delivery/me
+// Get logged-in delivery agent's profile
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    console.log("access attempt by user:",req.user.role,req.user.id);
+    if (req.user.role !== "delivery") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const user = await User.findById(req.user.id).select("-passwordHash");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Server error", err });
+  }
+});
+
 
 // GET /api/delivery/my-deliveries
-// Returns an ARRAY (possibly empty) of orders assigned to the logged-in delivery agent
+// Get all orders assigned to the logged-in delivery agent
 router.get(
   "/my-deliveries",
   authMiddleware,
