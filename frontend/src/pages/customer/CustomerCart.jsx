@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BottomNav from "../../components/ui/BottomNav";
 import { getCart, updateQty, removeFromCart } from "../../utils/Cart";
-import axios from "axios";
+import axios from "../../api/axios";
 
 export default function CustomerCart() {
   const [cart, setCart] = useState([]);
@@ -51,7 +51,7 @@ export default function CustomerCart() {
     };
 
     try {
-      await axios.post("/api/order/create", payload, {
+      await axios.post("/order/create", payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 

@@ -33,6 +33,10 @@ export default function PharmacySidebar() {
           onClick={() => navigate("/pharmacy/medicines/create")}>
           Create Medicine
         </Button>
+        <Button onClick={() => navigate("/pharmacy/assign-agent")}>
+          Assign Agent
+        </Button>
+
 
         <Button 
           onClick={() => navigate("/pharmacy/profile")}        >

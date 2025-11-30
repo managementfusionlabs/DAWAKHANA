@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import BottomNav from "../../components/ui/BottomNav";
-import axios from "axios";
+import axios from "../../api/axios";
 
 export default function CustomerOrders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     axios
-      .get("/api/order/my-orders", {
+      .get("/order/my-orders", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => setOrders(res.data))

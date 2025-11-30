@@ -5,7 +5,7 @@ import {
   updateOrderStatusByPharmacy,
    getAvailableAgents,
    pharmacyAssignAgent,
-   getMyOrders
+   getMyOrders,getQueue
 } from "../controllers/orderController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
@@ -62,6 +62,14 @@ router.get(
     }
   }
 );
+// Queue for pharmacy to assign agents
+router.get(
+  "/queue",
+  authMiddleware,
+  roleMiddleware("pharmacy"),
+  getQueue
+);
+
 
 
 

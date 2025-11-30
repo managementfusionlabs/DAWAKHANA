@@ -1,6 +1,6 @@
 // src/pages/pharmacy/EditMedicine.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
 import Input from "../../components/ui/Input";
@@ -21,7 +21,7 @@ export default function EditMedicine() {
   useEffect(() => {
     if (!itemId) return;
     axios
-      .get(`/api/inventory/${itemId}`, {
+      .get(`/inventory/${itemId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
@@ -48,7 +48,7 @@ export default function EditMedicine() {
     try {
       setLoading(true);
       await axios.put(
-        `/api/inventory/${itemId}`,
+        `/inventory/${itemId}`,
         {
           stock: Number(form.stock),
           price: Number(form.price),

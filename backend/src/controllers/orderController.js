@@ -133,6 +133,32 @@ export const updateOrderStatusByPharmacy = async (req, res) => {
 };
 
 
+// GET /api/order/queue
+// Returns orders ready_for_pickup and not yet assigned for the currently-logged-in pharmacy
+export const getQueue = async (req, res) => {
+  try {
+    // ensure this route is used by pharmacy role (roleMiddleware will enforce)
+    const pharmacyId = req.user.id;
+
+    const orders = await Order.find({
+      pharmacy: pharmacyId,
+      status: "ready_for_pickup",
+      $or: [{ deliveryAgent: { $exists: false } }, { deliveryAgent: null }],
+    })
+      .populate("customer")
+      .populate("items.medicine")
+      .sort({ createdAt: -1 });
+
+    // always return an array (empty if none)
+    return res.json(orders);
+  } catch (err) {
+    console.error("[order] getQueue error:", err);
+    return res.status(500).json({ message: "Failed to fetch queue" });
+  }
+};
+
+
+
 export const assignDeliveryAgent = async (req, res) => {
   try {
     const { orderId } = req.params;

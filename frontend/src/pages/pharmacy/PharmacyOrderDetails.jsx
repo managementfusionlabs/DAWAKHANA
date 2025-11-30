@@ -1,6 +1,6 @@
 // src/pages/pharmacy/PharmacyOrderDetails.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
 import Button from "../../components/ui/Button";
@@ -14,7 +14,7 @@ export default function PharmacyOrderDetails() {
 
   const loadOrder = async () => {
     try {
-      const { data } = await axios.get(`/api/order/pharmacy/${id}`, {
+      const { data } = await axios.get(`/order/pharmacy/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setOrder(data);
@@ -32,7 +32,7 @@ export default function PharmacyOrderDetails() {
     try {
       setLoadingStatus(true);
       await axios.put(
-        `/api/order/pharmacy/status/${id}`,
+        `/order/pharmacy/status/${id}`,
         { status },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

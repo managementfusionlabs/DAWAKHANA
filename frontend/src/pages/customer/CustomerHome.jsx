@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import BottomNav from "../../components/ui/BottomNav";
 import { addToCart } from "../../utils/Cart";
 
@@ -8,7 +8,7 @@ export default function CustomerHome() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("/api/customer/medicines").then((res) => {
+    axios.get("/customer/medicines").then((res) => {
       setItems(res.data || []);
     });
   }, []);

@@ -1,6 +1,6 @@
 // src/pages/pharmacy/PharmacyInventory.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
 import Button from "../../components/ui/Button";
@@ -13,7 +13,7 @@ export default function PharmacyInventory() {
   const navigate = useNavigate();
 
   const fetchInventory = () => {
-axios.get("/api/inventory/list", {
+axios.get("/inventory/list", {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
 })
   .then((res) => {
@@ -40,7 +40,7 @@ axios.get("/api/inventory/list", {
   const handleDelete = async (id) => {
     if (!confirm("Delete this inventory item?")) return;
     try {
-     axios.delete(`/api/inventory/delete/${id}`, {
+     axios.delete(`/inventory/delete/${id}`, {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
 })
 

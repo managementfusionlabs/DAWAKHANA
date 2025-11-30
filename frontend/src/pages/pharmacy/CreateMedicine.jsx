@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
 import Input from "../../components/ui/Input";
@@ -41,7 +41,7 @@ export default function CreateMedicine() {
 
     try {
       await axios.post(
-        "/api/pharmacy/medicines/create",
+        "/pharmacy/medicines/create",
         form,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

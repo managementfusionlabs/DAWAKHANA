@@ -1,6 +1,6 @@
 // src/pages/pharmacy/PharmacyOrders.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../api/axios";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/ui/GlassCard";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ export default function PharmacyOrders() {
 
   useEffect(() => {
     axios
-      .get("/api/order/pharmacy", {
+      .get("/order/pharmacy", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then((res) => setOrders(res.data))

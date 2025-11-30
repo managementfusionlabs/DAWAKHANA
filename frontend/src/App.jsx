@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 // DASHBOARDS
@@ -25,53 +26,58 @@ import AdminDeliveryAgents from "./pages/admin/AdminDeliveryAgents";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminPharmacyDetails from "./pages/admin/AdminPharmacyDetails";
 import CreateMedicine from "./pages/pharmacy/CreateMedicine";
+import AssignAgentList from "./pages/pharmacy/AssignAgentList";
+import AssignAgentDetails from "./pages/pharmacy/AssignAgentDetails";
+import DeliveryOrderDetailsPage from "./pages/delivery/DeliveryOrderDetails";
 
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-
-        {/* Auth */}
-        {/* <h1 className="text-4xl text-red-500">Tailwind Working!</h1> */}
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-        {/* Customer */}
-        <Route path="/customer/home" element={<CustomerHome />} />
-        <Route path="/customer/orders" element={<CustomerOrders />} />
-        <Route path="/customer/cart" element={<CustomerCart />} />
-        <Route path="/customer/profile" element={<CustomerProfile />} />
-
-        {/* Pharmacy */}
-        <Route path="/pharmacy/dashboard" element={<PharmacyDashboard />} />
-        <Route path="/pharmacy/orders" element={<PharmacyOrders />} />
-        <Route path="/pharmacy/orders/:id" element={<PharmacyOrderDetails />} />
-        <Route path="/pharmacy/inventory" element={<PharmacyInventory />} />
-        <Route path="/pharmacy/add-medicine" element={<AddMedicine />} />
-        <Route path="/pharmacy/medicine/:id/edit" element={<EditMedicine />} />
-        <Route path="/pharmacy/medicines/create" element={<CreateMedicine />} />
-
-        {/* <Route path="/pharmacy/profile" element={<PharmacyProfile />} /> */}
+return (
+<BrowserRouter>
+<Routes>
+<Route path="/" element={<Login />} />
+<Route path="/signup" element={<Signup />} />
 
 
-        {/* Delivery */}
-        <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
-        <Route path="/delivery/order/:id" element={<DeliveryOrderDetails />} />
-        <Route path="/delivery/history" element={<DeliveryHistory />} />
-        <Route path="/delivery/profile" element={<DeliveryProfile />} />
-        
-        {/* Admin */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/pharmacies" element={<AdminPharmacies />} />
-        <Route path="/admin/customers" element={<AdminCustomers />} />
-        <Route path="/admin/delivery-agents" element={<AdminDeliveryAgents />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/pharmacies/:id" element={<AdminPharmacyDetails />} />
+{/* Customer */}
+<Route path="/customer/home" element={<ProtectedRoute role={"customer"}><CustomerHome /></ProtectedRoute>} />
+<Route path="/customer/orders" element={<ProtectedRoute role={"customer"}><CustomerOrders /></ProtectedRoute>} />
+<Route path="/customer/cart" element={<ProtectedRoute role={"customer"}><CustomerCart /></ProtectedRoute>} />
+<Route path="/customer/profile" element={<ProtectedRoute role={"customer"}><CustomerProfile /></ProtectedRoute>} />
 
-      </Routes>
-    </BrowserRouter>
-  );
+
+{/* Pharmacy */}
+<Route path="/pharmacy/dashboard" element={<ProtectedRoute role={"pharmacy"}><PharmacyDashboard /></ProtectedRoute>} />
+<Route path="/pharmacy/orders" element={<ProtectedRoute role={"pharmacy"}><PharmacyOrders /></ProtectedRoute>} />
+<Route path="/pharmacy/orders/:id" element={<ProtectedRoute role={"pharmacy"}><PharmacyOrderDetails /></ProtectedRoute>} />
+<Route path="/pharmacy/inventory" element={<ProtectedRoute role={"pharmacy"}><PharmacyInventory /></ProtectedRoute>} />
+<Route path="/pharmacy/add-medicine" element={<ProtectedRoute role={"pharmacy"}><AddMedicine /></ProtectedRoute>} />
+<Route path="/pharmacy/medicine/:id/edit" element={<ProtectedRoute role={"pharmacy"}><EditMedicine /></ProtectedRoute>} />
+<Route path="/pharmacy/medicines/create" element={<ProtectedRoute role={"pharmacy"}><CreateMedicine /></ProtectedRoute>} />
+<Route path="/pharmacy/assign-agent" element={<ProtectedRoute role={"pharmacy"}><AssignAgentList /></ProtectedRoute>} />
+<Route path="/pharmacy/assign-agent/:id" element={<ProtectedRoute role={"pharmacy"}><AssignAgentDetails /></ProtectedRoute>} />
+
+
+{/* Delivery */}
+<Route path="/delivery/dashboard" element={<ProtectedRoute role={"delivery"}><DeliveryDashboard /></ProtectedRoute>} />
+<Route path="/delivery/order/:id" element={<ProtectedRoute role={"delivery"}><DeliveryOrderDetails /></ProtectedRoute>} />
+<Route path="/delivery/history" element={<ProtectedRoute role={"delivery"}><DeliveryHistory /></ProtectedRoute>} />
+<Route path="/delivery/profile" element={<ProtectedRoute role={"delivery"}><DeliveryProfile /></ProtectedRoute>} />
+
+
+{/* Admin */}
+<Route path="/admin/dashboard" element={<ProtectedRoute role={"admin"}><AdminDashboard /></ProtectedRoute>} />
+<Route path="/admin/pharmacies" element={<ProtectedRoute role={"admin"}><AdminPharmacies /></ProtectedRoute>} />
+<Route path="/admin/customers" element={<ProtectedRoute role={"admin"}><AdminCustomers /></ProtectedRoute>} />
+<Route path="/admin/delivery-agents" element={<ProtectedRoute role={"admin"}><AdminDeliveryAgents /></ProtectedRoute>} />
+<Route path="/admin/orders" element={<ProtectedRoute role={"admin"}><AdminOrders /></ProtectedRoute>} />
+<Route path="/admin/pharmacies/:id" element={<ProtectedRoute role={"admin"}><AdminPharmacyDetails /></ProtectedRoute>} />
+
+
+</Routes>
+</BrowserRouter>
+);
 }
+
 
 export default App;
